@@ -1,2 +1,2 @@
-= Restful role for Rails models
+# Restful role for Rails models
 
