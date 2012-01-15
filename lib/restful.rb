@@ -3,6 +3,23 @@ module Restful
   
   attr_reader :actions
   
+  def self.mapping
+    @_mapping ||= { }
+  end
+  
+  def self.initialize_mapping
+    Rails.application.routes.routes.each do |route|
+      unless route.verb.empty?
+        verb       = route.verb.downcase.to_sym
+        controller = route.conditions[:controller]
+        action     = route.conditions[:action]
+        
+        mapping[controller]         ||= { }
+        mapping[controller][action]   = { method: verb }
+      end
+    end
+  end
+  
   def default_actions
     { show:    { method: :get    }, 
       update:  { method: :put    }, 
@@ -16,6 +33,13 @@ module Restful
   
   def default_allowed_actions(*whitelist)
     default_actions.select { |k, v| whitelist.include? k }
+  end
+  
+  def setup_actions_from_controller(controller)
+    if Restful.mapping.empty?
+      Restful.initialize_mapping
+    end
+    allowed_actions Restful.mapping[controller.class.to_s.sub(/_controller$/,'')]
   end
   
   # accepts a hash of actions, keyed by action
