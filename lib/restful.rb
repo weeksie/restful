@@ -11,17 +11,26 @@ module Restful
     Rails.application.routes.routes.each do |route|
       unless route.verb.empty?
         verb       = route.verb.downcase.to_sym
-        controller = route.conditions[:controller]
-        action     = route.conditions[:action]
+        controller = route.defaults[:controller].to_sym
+        action     = route.defaults[:action].to_sym
+        config     = { method: verb }
+        
+        if route.defaults[:member]
+          config[:as] = :member
+        elsif route.defaults[:collection]
+          config[:as] = :collection
+        end
         
         mapping[controller]         ||= { }
-        mapping[controller][action]   = { method: verb }
+        mapping[controller][action]   = config
       end
     end
+    mapping
   end
   
   def default_actions
     { show:    { method: :get    }, 
+      index:   { method: :get    }, 
       update:  { method: :put    }, 
       create:  { method: :post   }, 
       destroy: { method: :delete } }
@@ -39,7 +48,7 @@ module Restful
     if Restful.mapping.empty?
       Restful.initialize_mapping
     end
-    allowed_actions Restful.mapping[controller.class.to_s.sub(/_controller$/,'')]
+    allowed_actions Restful.mapping[controller.class.to_s.underscore.sub(/_controller$/,'').to_sym]
   end
   
   # accepts a hash of actions, keyed by action
@@ -54,7 +63,7 @@ module Restful
     allowed.each do |k,v|
       action_alias = v[:action_alias] || k
       url         = case k
-                    when :show, :update, :delete
+                    when :show, :update, :edit, :destroy
                       send "#{prefix}_url", self
                     when :new
                       send "new_#{prefix}_url"
@@ -66,7 +75,7 @@ module Restful
                       elsif v[:as] == :collection
                         send "#{k}_#{prefix.pluralize}_url"
                       else
-                        raise Exception.new("Must specify member or collection for custom action")
+                        raise Exception.new("Must specify member or collection for custom action, got #{k} => #{v.inspect}")
                       end
                     end
       
