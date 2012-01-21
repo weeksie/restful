@@ -4,6 +4,18 @@ This is has been pulled from another project where it is fully tested and it's o
 
 RESTful APIs should be discoverable and this mixin/role is a way to add mappings of restful actions to objects that are being rendered `as_json`. 
 
+## Config
+
+in `config/initializers/restful.rb`
+
+```
+Restful.send :include, Rails.application.routes.url_helpers
+```
+
+
+## Example
+
+
 ```
 class BlahController
  before_filter :add_restful_role_to_blah
@@ -41,3 +53,4 @@ In the above example, the resource returned would look something like this
 ```
 
 Available actions are inferred from the Rails route set.
+
