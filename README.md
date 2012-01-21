@@ -34,7 +34,7 @@ In the above example, the resource returned would look something like this
   "id": 1,
   "attr": "fnord",
   "actions": {
-    "show": { "url":"http://example.com/blah/1", "method": "get" }
+    "show": { "url": "http://example.com/blah/1", "method": "get" }
     "update": { "url": "http://example.com/blah/1", "method": "put" }
   }
 }
