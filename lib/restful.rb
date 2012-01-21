@@ -54,11 +54,11 @@ module Restful
     allowed.each do |k,v|
       action_alias = v[:action_alias] || k
       url         = case k
-                    when :show, :update
+                    when :show, :update, :delete
                       send "#{prefix}_url", self
                     when :new
                       send "new_#{prefix}_url"
-                    when :create, :destroy
+                    when :create
                       send "#{prefix.pluralize}_url"
                     else
                       if v[:as] == :member
