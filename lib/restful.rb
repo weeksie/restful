@@ -67,7 +67,7 @@ module Restful
                       send "#{prefix}_url", self
                     when :new
                       send "new_#{prefix}_url"
-                    when :create
+                    when :create, :index
                       send "#{prefix.pluralize}_url"
                     else
                       if v[:as] == :member
